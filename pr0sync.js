@@ -123,7 +123,7 @@ async function sync_gala()
       
       if(planet_div == undefined || player_div == undefined)
       {
-        alert("Fehlerhafte Tabelle vorgefunden. Bitte an Cornelius wenden.");
+        alert("Fehlerhafte Tabelle vorgefunden.");
         return;
       }
       // Planetenname nur ohne Aktivitätsinfo übernehmen
@@ -197,7 +197,7 @@ async function sync_spio(header_tr, send_discord)
 {
   const msg_id = /(\d+)$/g.exec(header_tr.getAttribute('id'))[1];
   if(msg_id === undefined)
-    alert("Konnte Spionagebericht nicht extrahieren. Bitte bei Cornelius melden!");
+    alert("Konnte Spionagebericht nicht extrahieren.");
   console.log("Sync", msg_id);
   const body_tr = header_tr.querySelector('div.message-content');
   
@@ -228,7 +228,7 @@ async function sync_spio(header_tr, send_discord)
   }
   if(galaxy == 0 || system == 0 || planet == 0 || planettype == 0)
   {
-    alert("Konnte Zielplanet nicht bestimmen. Bitte bei Cornelius melden");
+    alert("Konnte Zielplanet nicht bestimmen.");
     return;
   }
   
@@ -302,7 +302,7 @@ async function sync_stat()
   var update_time = /\(.*?(\d+:\d+:\d+)\)$/g.exec(header);
   if(update_time.length < 2)
   {
-    alert("Konnte Updatezeitpunkt nicht bestimmen. Bitte an Cornelius wenden.");
+    alert("Konnte Updatezeitpunkt nicht bestimmen.");
     return;
   }
   update_time = update_time[1];
@@ -382,13 +382,13 @@ async function playercard_sync(iref)
   const rows = iref.querySelectorAll('table tr');
   if(rows.length < 28)
   {
-    alert('Konnte Playercard nicht extrahieren. Bitte an Cornelius wenden');
+    alert('Konnte Playercard nicht extrahieren.');
     return;
   }
   var user_id = document.querySelector('iframe').contentDocument.URL.split('=');
   if(user_id.length != 3)
   {
-    alert('Konnte User-ID nicht extrahieren. Bitte an Cornelius wenden');
+    alert('Konnte User-ID nicht extrahieren.');
     return;
   }
   user_id = user_id[2] * 1;
@@ -402,7 +402,7 @@ async function playercard_sync(iref)
     alli_id = /&id=(\d+)'/g.exec(alli_id)
     if(alli_id.length < 2)
     {
-      alert('Konnte Allianz nicht extrahieren. Bitte an Cornelius wenden');
+      alert('Konnte Allianz nicht extrahieren.');
       return;
     }
     alli_id = alli_id[1] * 1;
