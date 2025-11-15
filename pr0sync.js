@@ -95,55 +95,45 @@ async function sync_gala()
   var gala = document.querySelector('input[name=galaxy]').getAttribute("value") * 1;
   var system = document.querySelector('input[name=system]').getAttribute("value") * 1;
   // Darauf vertrauend, dass "table569" uns erhalten bleibt...
-  const gala_table = document.querySelector('table.table569');
+  const gala_table = document.querySelector('div.galaxy-grid-container');
   // diejenigen Zeilen selektieren, die Planeteninfos beinhalten
-  const planet_trs = gala_table.querySelectorAll('tr:has(>td + td + td + td + td)'); 
+  const planet_trs = gala_table.querySelectorAll('div[data-info]'); 
+  if(planet_trs.length !=16)
+  {
+    alert("Konnte Planeten nicht bestimmen!");
+    return;
+  }
+  console.log(planet_trs);
   
   var planets = [];
-  for(var i = 0; i < planet_trs.length; i++)
+  for(var i = 0; i < 15; i++)
   {
     const planet = i + 1;
     const planet_tr = planet_trs[i];
     // Wenn kein Bild gehen wir von leerer Position aus
-    if(planet_tr.querySelector('td:nth-child(2) a img') == null)
+    if(planet_tr.classList.contains("empty"))
     {
       continue;
     }
     else
     {
       // Planet ist besiedelt
-      const planet_tds = planet_tr.querySelectorAll('td');
-      if(planet_tds.length != 8)
+      const planet_div = planet_tr.querySelector("div.galaxy-planet");
+      const player_div = planet_tr.querySelector("div.galaxy-player");
+      
+      if(planet_div == undefined || player_div == undefined)
       {
-        alert("Fehlerhafte Tabelle vorgefunden.");
+        alert("Fehlerhafte Tabelle vorgefunden. Bitte an Cornelius wenden.");
         return;
       }
       // Planetenname nur ohne Aktivitätsinfo übernehmen
       
-      var planet_name = planet_tds[2].textContent.replace(/\(\*?(\d+ min)?\)$/g, "");
-      var planet_picture = planet_tds[1].querySelector('img').getAttribute('src');
-      var planet_id = extract_id(planet_tds[1].querySelector('a'));
+      var planet_name = planet_div.textContent.trim().replace(/\(\*?(\d+ min)?\)$/g, "");
+      var planet_picture = planet_div.querySelector('img').getAttribute('src').trim();
+      var planet_id = extract_id(planet_div.querySelector('a'));
       
       
-      // Mondinformationen sammeln
-      var moon_name = "";
-      var moon_picture = "";
-      var has_moon = false;
-      var moon_id = 0;
-      if(planet_tds[3].querySelector('img') != null)
-      {
-        has_moon = true;
-        moon_picture = planet_tds[3].querySelector('img').getAttribute('src');
-        // Der Mondname ist hinter dem Pop-Up versteckt, daher etwas unschön erst mal ein Element konstruieren das wir befragen können
-        const moon_data = planet_tds[3].querySelector('a').getAttribute('data-tooltip-content');
-        var moon_info = document.createElement("div");
-        moon_info.innerHTML = moon_data;
-        moon_name = moon_info.querySelector('th').textContent.replace(/^[^\s]* /g,'').replace(/\[\d+:\d+:\d+\]$/g, '');
-        moon_id = extract_id(planet_tds[3].querySelector('a'));
-        
-      }
-      
-      var player_id = extract_id(planet_tds[5].querySelector('a'));
+      var player_id = extract_id(player_div.querySelector('a'));
       
       if(planet_id === 0)
       {
@@ -164,17 +154,8 @@ async function sync_gala()
           planet_id = found_ids[0]
         else
         {
-          // Wenn wir einen Mond haben, dürfte der später entstanden sein als der Planet :)
-          if(found_ids[0] < found_ids[1])
-          {
-            planet_id = found_ids[0]
-            moon_id = found_ids[1]
-          }
-          else
-          {
-            planet_id = found_ids[1]
-            moon_id = found_ids[0]
-          }
+          alert("Eigener Planet nicht gefunden!");
+          return;
         }
         
       }
@@ -186,16 +167,17 @@ async function sync_gala()
         'planet_id': planet_id,
         'planet_picture': planet_picture,
         'planet_name': planet_name.trim(),
-        'moon_id': moon_id,
-        'moon_picture': moon_picture,
-        'moon_name': moon_name.trim(),
-        'has_moon': has_moon,
+        'moon_id': 0,
+        'moon_picture': "",
+        'moon_name': "",
+        'has_moon': false,
         'player_id': player_id,
         'is_destroyed': false,
       };
       planets.push(planet_info);
     }
   }
+  
   try{
   	await pb.send("/galaxy", {
       method: 'POST',
@@ -208,20 +190,23 @@ async function sync_gala()
   } catch (e) {
     alert("Fehler beim Speichern: " + e.message);
   }
+  console.log(planets);
 }
 
 async function sync_spio(header_tr, send_discord)
 {
   const msg_id = /(\d+)$/g.exec(header_tr.getAttribute('id'))[1];
   if(msg_id === undefined)
-    alert("Konnte Spionagebericht nicht extrahieren.");
-  const body_tr = document.querySelector('tr.messages_body.message_'+msg_id);
+    alert("Konnte Spionagebericht nicht extrahieren. Bitte bei Cornelius melden!");
+  console.log("Sync", msg_id);
+  const body_tr = header_tr.querySelector('div.message-content');
   
   // Scan-Zeitpunkt extrahieren
-  const timestamp = header_tr.querySelectorAll('td')[1].textContent
+  const timestamp = header_tr.querySelector('div.message-date').textContent.trim()
   
   // Herausfinden, welche Daten im Bericht enthalten sind
   const headers = body_tr.querySelectorAll('div.spyRaportContainerHead');
+  
   var has_class0 = false;
   var has_class100 = false;
   var has_class200 = false;
@@ -243,7 +228,7 @@ async function sync_spio(header_tr, send_discord)
   }
   if(galaxy == 0 || system == 0 || planet == 0 || planettype == 0)
   {
-    alert("Konnte Zielplanet nicht bestimmen.");
+    alert("Konnte Zielplanet nicht bestimmen. Bitte bei Cornelius melden");
     return;
   }
   
@@ -296,6 +281,7 @@ async function sync_spio(header_tr, send_discord)
           data_maps['dat900'],
          ],
   }
+  /*
   try{
     await pb.send("/spio", {
       method: 'POST',
@@ -303,7 +289,7 @@ async function sync_spio(header_tr, send_discord)
     });
   } catch (e) {
     alert("Fehler beim Speichern: " + e.message);
-  }
+  }*/
   console.log(report);
 }
 
@@ -316,7 +302,7 @@ async function sync_stat()
   var update_time = /\(.*?(\d+:\d+:\d+)\)$/g.exec(header);
   if(update_time.length < 2)
   {
-    alert("Konnte Updatezeitpunkt nicht bestimmen.");
+    alert("Konnte Updatezeitpunkt nicht bestimmen. Bitte an Cornelius wenden.");
     return;
   }
   update_time = update_time[1];
@@ -396,13 +382,13 @@ async function playercard_sync(iref)
   const rows = iref.querySelectorAll('table tr');
   if(rows.length < 28)
   {
-    alert('Konnte Playercard nicht extrahieren.');
+    alert('Konnte Playercard nicht extrahieren. Bitte an Cornelius wenden');
     return;
   }
   var user_id = document.querySelector('iframe').contentDocument.URL.split('=');
   if(user_id.length != 3)
   {
-    alert('Konnte User-ID nicht extrahieren.');
+    alert('Konnte User-ID nicht extrahieren. Bitte an Cornelius wenden');
     return;
   }
   user_id = user_id[2] * 1;
@@ -416,7 +402,7 @@ async function playercard_sync(iref)
     alli_id = /&id=(\d+)'/g.exec(alli_id)
     if(alli_id.length < 2)
     {
-      alert('Konnte Allianz nicht extrahieren.');
+      alert('Konnte Allianz nicht extrahieren. Bitte an Cornelius wenden');
       return;
     }
     alli_id = alli_id[1] * 1;
@@ -431,19 +417,19 @@ async function playercard_sync(iref)
   const total_rank = rows[8].querySelector('td:last-child').textContent.trim() * 1;
   const total_points = rows[8].querySelector('td:nth-child(3)').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
   
-  const won_fights = rows[12].querySelector('td:nth-child(3)').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const drawn_fights = rows[13].querySelector('td:nth-child(3)').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const lost_fights = rows[14].querySelector('td:nth-child(3)').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const won_fights = 0; //rows[12].querySelector('td:nth-child(3)').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const drawn_fights =0; // rows[13].querySelector('td:nth-child(3)').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const lost_fights =0; // rows[14].querySelector('td:nth-child(3)').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
   
-  const killed_involved = rows[17].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const lost_involved = rows[18].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const met_involved = rows[19].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const kris_involved = rows[20].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const killed_involved = 0; //rows[17].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const lost_involved = 0; //rows[18].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const met_involved = 0; //rows[19].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const kris_involved = 0; //rows[20].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
   
-  const killed_real = rows[22].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const lost_real = rows[23].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const met_real = rows[24].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
-  const kris_real = rows[25].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const killed_real = 0; //rows[22].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const lost_real = 0; //rows[23].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const met_real = 0; //rows[24].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
+  const kris_real = 0; //rows[25].querySelector('td:last-child').textContent.replaceAll(',','').replaceAll('.', '').trim() * 1;
   
   const player_card = {
     user_id: user_id,
@@ -485,7 +471,7 @@ async function playercard_sync(iref)
 }
 
 // Findet alle aktuell angezeigten Spionageberichte
-var spy_reports = document.querySelectorAll('tr.message_head:has(+tr.messages_body td div.spyRaport)');
+var spy_reports = document.querySelectorAll('div.message-item:has(div.message-content > div.spyRaport)');
 // Findet die "Sync" Zeile in der Galaxieansicht
 var gala_sync = document.querySelector('td:has(input#gala_sync)');
 // Findet Flottenbewegungen in der Phalanx
@@ -496,7 +482,7 @@ var stat_sync = document.querySelector('table.table519');
 for(var i = 0; i < spy_reports.length; i++)
 {
   const current_report = spy_reports[i];
-  var icon_bar = current_report.querySelector("td:has(a img)");
+  var icon_bar = current_report.querySelector("div.message-actions");
   
   const send_icon = make_icon_send('green', '20px', '20px');
   icon_bar.appendChild(send_icon);
@@ -644,3 +630,4 @@ if(document.querySelector('form[action="game.php?page=settings"]') != null)
       if (event.key === 'Enter') user_login();
   });
 }
+
