@@ -447,26 +447,26 @@ async function playercard_sync(iref, share_icon) {
     const total_points = rows[8].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
 
 
-    const won_fights = rows[12].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const drawn_fights = rows[13].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const lost_fights = rows[14].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const won_fights = 0; // rows[12].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const drawn_fights = 0; // rows[13].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const lost_fights = 0; // rows[14].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
 
-    const honour_points = rows[17].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const honour_rank = rows[18].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const honour_points = 0; // rows[17].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const honour_rank = 0; // rows[18].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
 
-    const fights_good = rows[21].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const fights_bad = rows[22].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const fights_neutral = rows[23].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const fights_good = 0; // rows[21].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const fights_bad = 0; // rows[22].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const fights_neutral = 0; // rows[23].querySelector('td:nth-child(3)').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
 
-    const killed_involved = rows[25].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const lost_involved = rows[26].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const met_involved = rows[27].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const kris_involved = rows[28].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const killed_involved = 0; // rows[25].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const lost_involved = 0; // rows[26].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const met_involved = 0; // rows[27].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const kris_involved = 0; // rows[28].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
 
-    const killed_real = rows[30].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const lost_real = rows[31].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const met_real = rows[32].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
-    const kris_real = rows[33].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const killed_real = 0; // rows[30].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const lost_real = 0; // rows[31].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const met_real = 0; // rows[32].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
+    const kris_real = 0; // rows[33].querySelector('td:last-child').textContent.replaceAll(',', '').replaceAll('.', '').trim() * 1;
 
     const player_card = {
         user_id: user_id,
